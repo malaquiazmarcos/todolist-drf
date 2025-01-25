@@ -3,8 +3,17 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view 
 from todolist.serializers import TasksSerializer
 from todolist.models import Tasks
+from drf_yasg.utils import swagger_auto_schema
 
 # ver y crear 
+@swagger_auto_schema(
+    methods=['post'],
+    request_body=TasksSerializer,  
+    responses={
+        201: TasksSerializer,  
+        400: "Datos inválidos"  
+    }
+)
 @api_view(['GET', 'POST'])
 def task_list_create(request):
     if request.method == 'GET':
@@ -20,6 +29,13 @@ def task_list_create(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # obtener, actualizar y/o eliminar
+@swagger_auto_schema(method='get', responses={200: TasksSerializer, 404: "Task not found"})
+@swagger_auto_schema(
+    method='put',
+    request_body=TasksSerializer,
+    responses={200: TasksSerializer, 400: "Datos inválidos", 404: "Task not found"}
+)
+@swagger_auto_schema(method='delete', responses={204: "Task deleted successfully", 404: "Task not found"})
 @api_view(['GET', 'PUT', 'DELETE'])
 def task_list_edit(request, pk):
     try:
